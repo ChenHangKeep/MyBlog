@@ -20,6 +20,7 @@
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="{% static 'blog/js/pace.min.js' %}"></script>
     <script src="{% static 'blog/js/modernizr.custom.js' %}"></script>
+    {% block content_js %}{% endblock %}
 </head>
 
 <body>
@@ -61,8 +62,8 @@
         </div>
     </header>
 </div>
-<div class="copyrights">Collect from <a href="http://www.cssmoban.com/">网页模板</a></div>
-<div class="copyrights">Modified by <a href="#">keep_it_up</a></div>
+{#<div class="copyrights">Collect from <a href="http://www.cssmoban.com/">网页模板</a></div>#}
+{#<div class="copyrights">Modified by <a href="#">keep_it_up</a></div>#}
 
 <div class="content-body">
     <div class="container">
@@ -72,10 +73,10 @@
                 {% endblock main %}
             </main>
             <aside class="col-md-4">
-                {% block toc %}
-                {% endblock toc %}
             </aside>
+
             <aside class="col-md-4">
+            {% block newest %}
                 <div class="widget widget-recent-posts">
                     <h3 class="widget-title">最新文章</h3>
                     <ul>
@@ -88,6 +89,7 @@
                     {% endfor %}
                     </ul>
                 </div>
+            {% endblock %}
                 <div class="widget widget-archives">
                     <h3 class="widget-title">归档</h3>
                     {% archives as date_list %}
@@ -155,6 +157,7 @@
                     <a href=""><span class="ion-social-rss-outline"></span> RSS 订阅</a>
                 </div>
             </aside>
+
         </div>
     </div>
 </div>

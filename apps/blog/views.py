@@ -6,6 +6,7 @@ from django.shortcuts import render,get_object_or_404
 from django.views.generic import View
 
 from .models import Article,Category
+from comments.models import Comment
 
 # Create your views here.
 
@@ -36,6 +37,8 @@ class DetailView(View):
     def get(self, request,article_id):
         article = Article.objects.get(id=int(article_id))
 
+        newest_article = Article.objects.all().order_by("-add_time")[:3]
+
         #增加阅读数
         article.views +=1
         article.save()
@@ -47,7 +50,8 @@ class DetailView(View):
                                           'markdown.extensions.toc',
                                       ])
         return render(request, 'detail.html', {
-            'article':article
+            'article':article,
+            'newest_article':newest_article
         })
 
 

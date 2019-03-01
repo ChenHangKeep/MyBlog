@@ -15,46 +15,34 @@
                         </div>
                     </header>
                     <div class="entry-content clearfix">
-                        {{ article.content|safe }}
+                        {{ article.content|safe}}
                     </div>
                 </article>
                 <section class="comment-area" id="comment-area">
                     <hr>
                     <h3>发表评论</h3>
-                    <form action="{% url 'comments:article_comment' article.id %}" method="post" class="comment-form">
-                        {% csrf_token %}
+                    <form action="{% url 'comments:article_comment' article.id %}" method="post" class="comment-form" id="jsStayForm">
                         <div class="row">
-                            <div class="col-md-4">
-                                <label for="{{ form.name.id_for_label }}">名字：</label>
-                                {{ form.name }}
-                                {{ form.name.errors }}
-
+                            <div class="form-group">
+                                <label class="name">名字:  </label>
+                                <input name="comment_name" type="text" class="form-name" id="js-name" placeholder="不超过20个字">
                             </div>
-                            <div class="col-md-4">
-                                <label for="{{ form.email.id_for_label }}">邮箱：</label>
-                                {{ form.email }}
-                                {{ form.emali.errors }}
-                            </div>
-                            <div class="col-md-4">
-                                <label for="{{ form.url.id_for_label }}">网址：</label>
-                                {{ form.url }}
-                                {{ form.url.errors }}
-                            </div>
-                            <div class="col-md-12">
-                                <label for="{{ form.text.id_for_label }}">评论：</label>
-                                {{ form.text }}
-                                {{ form.text.erros }}
-                                <button type="submit" class="comment-btn">发表</button>
-                            </div>
+                        <div class="form-group">
+                            <label class="comment">评论:</label>
+                            <textarea name="text" class="form-control" id="js-content" rows="5" placeholder="不超过300个字"></textarea>
+                        </div>
+                            <input name="article" type="hidden" id="js-name" value="{{ article.id }}">
+                            <p class="error company-tips" id="jsCompanyTips"></p>
+                            <button class="btn" type="button" id="jsStayBtn" value="发表">发表</button>
                         </div>    <!-- row -->
                     </form>
                     <div class="comment-list-panel">
-                        <h3>评论列表，共 <span>{{ post.comment_set.count }}</span> 条评论</h3>
+                        <h3>评论列表，共 <span>{{ article.comment_set.count }}</span> 条评论</h3>
                         <ul class="comment-list list-unstyled">
-                            {% for comment in comment_list %}
+                            {% for comment in all_comments %}
                             <li class="comment-item">
-                                <span class="nickname">{{ comment.name }}</span>
-                                <time class="submit-date" >{{ comment.created_time }}</time>
+                                <span class="nickname">{{ comment.comment_name }}</span>
+                                <time class="submit-date" >{{ comment.add_time }}</time>
                                 <div class="text">
                                     {{ comment.text }}
                                 </div>
@@ -68,25 +56,48 @@
                 </section>
 
 {% endblock main %}
-{% block toc %}
-    <div class="widget widget-content">
-        <h3 class="widget-title">文章目录</h3>
-        <ul>
-            <li>
-                <a href="#">教程特点</a>
-            </li>
-            <li>
-                <a href="#">谁适合这个教程</a>
-            </li>
-            <li>
-                <a href="#">在线预览</a>
-            </li>
-            <li>
-                <a href="#">资源列表</a>
-            </li>
-            <li>
-                <a href="#">获取帮助</a>
-            </li>
-        </ul>
-    </div>
-{% endblock toc %}
+{% block newest %}
+                <div class="widget widget-recent-posts">
+                    <h3 class="widget-title">最新文章</h3>
+                    <ul>
+                    {% for article in newest_article %}
+                        <li>
+                            <a href="{% url "blog:article_detail" article.id %}">{{ article.title }}</a>
+                        </li>
+                    {% empty %}
+                        暂无文章
+                    {% endfor %}
+                    </ul>
+                </div>
+{% endblock %}
+{% block content_js %}
+<script>
+    $(function(){
+        $('#jsStayBtn').on('click', function(){
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url:"{% url 'comments:add_comment' %}",
+                data:$('#jsStayForm').serialize(),
+                dateType:"json",
+                async: true,
+                beforeSend:function(xhr, settings){
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            },
+                success: function(data) {
+                    if(data.status == 'success'){
+                        alert("提交成功");
+                         window.location.reload();//刷新当前页面.
+                    }else if(data.status == 'fail'){
+                        alert("评论错误，请重新评论");
+                    }
+                },
+            });
+        });
+    })
+
+</script>
+{% endblock %}
+
+

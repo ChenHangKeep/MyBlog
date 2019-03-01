@@ -41,6 +41,11 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+    #重定向
+    def get_absolute_url(self):
+        # 这里 reverse 解析 blog:detail 视图函数对应的 url
+        return reverse('blog:detail', kwargs={'article_id': self.id})
+
     def save(self,*args,**kwargs):
         if not self.excerpt:
             # 首先实例化一个Markdown 类 用于渲染content的文本
